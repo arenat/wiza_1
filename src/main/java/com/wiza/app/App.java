@@ -6,6 +6,7 @@ import com.wiza.controller.UserController;
 import com.wiza.dao.UserDAO;
 import com.wiza.healthcheck.TemplateHealthCheck;
 import io.dropwizard.Application;
+import io.dropwizard.hibernate.SessionFactoryHealthCheck;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -13,7 +14,7 @@ import org.skife.jdbi.v2.DBI;
 
 import java.util.Arrays;
 
-    public class App extends Application<AppConfig> {
+public class App extends Application<AppConfig> {
     public static void main(String[] args) throws Exception {
         new App().run((String[]) Arrays.asList("server", "config.yml").toArray());
 
@@ -43,45 +44,48 @@ import java.util.Arrays;
 
     @Override
     public void run(AppConfig configuration,
-                    Environment environment) {
-        // nothing to do yet
-        IndexController controller = new IndexController(
-                configuration.getTemplate(),
-                configuration.getDefaultName(),
-                configuration.getPortConfig().getServerPort());
-
-        TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
-
+                    Environment environment)
+    {
         // create a new DBIFactory
         final DBIFactory factory = new DBIFactory();
         final DBI jdbi = factory.build(environment, configuration.getDatabase(), "mysql"); // DataSourceFactory
 
-        // Create dao
+        // create daos
         final UserDAO userDAO = jdbi.onDemand(UserDAO.class);
 
+        // create controllers
+        final IndexController controller = new IndexController(
+                configuration.getTemplate(),
+                configuration.getDefaultName(),
+                configuration.getPortConfig().getServerPort());
+        final UserController userController = new UserController(userDAO);
+
+        // create health checks
+        final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
+
+        // set up environment
         environment.healthChecks().register("template", healthCheck);
         environment.jersey().register(controller);
-        environment.jersey().register(new UserController(userDAO));
-
-        /**         *public class TruncateDatabaseTask extends Task {
-         *     private final Database database;
-         *
-         *     public TruncateDatabaseTask(Database database) {
-         *         super('truncate');
-         *         this.database = database;
-         *     }
-         *
-         *       @Override
-         *     public void execute(ImmutableMultimap<String, String> parameters, PrintWriter output) throws Exception {
-         *         this.database.truncate();
-         *     }
-         * }
-         *
-         * environment.admin().addTask(new TruncateDatabaseTask(database));
-         *
-         * $ curl -X POST http://dw.example.com:8081/tasks/gc
-         * Running GC...
-         * Done!
-         */
+        environment.jersey().register(userController);
     }
 }
+/**         *public class TruncateDatabaseTask extends Task {
+ *     private final Database database;
+ *
+ *     public TruncateDatabaseTask(Database database) {
+ *         super('truncate');
+ *         this.database = database;
+ *     }
+ *
+ *       @Override
+ *     public void execute(ImmutableMultimap<String, String> parameters, PrintWriter output) throws Exception {
+ *         this.database.truncate();
+ *     }
+ * }
+ *
+ * environment.admin().addTask(new TruncateDatabaseTask(database));
+ *
+ * $ curl -X POST http://dw.example.com:8081/tasks/gc
+ * Running GC...
+ * Done!
+ */
