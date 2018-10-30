@@ -6,8 +6,10 @@ import com.wiza.controller.UserController;
 import com.wiza.dao.UserDAO;
 import com.wiza.healthcheck.TemplateHealthCheck;
 import io.dropwizard.Application;
+import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.SessionFactoryHealthCheck;
 import io.dropwizard.jdbi.DBIFactory;
+import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.skife.jdbi.v2.DBI;
@@ -16,7 +18,7 @@ import java.util.Arrays;
 
 public class App extends Application<AppConfig> {
     public static void main(String[] args) throws Exception {
-        new App().run((String[]) Arrays.asList("server", "config.yml").toArray());
+        new App().run(args);
 
     }
 
@@ -27,6 +29,12 @@ public class App extends Application<AppConfig> {
 
     @Override
     public void initialize(Bootstrap<AppConfig> bootstrap) {
+        bootstrap.addBundle(new MigrationsBundle<AppConfig>() {
+            @Override
+            public DataSourceFactory getDataSourceFactory(AppConfig configuration) {
+                return configuration.getDatabase(); // data source factory
+            }
+        });
         // bundles, configuration source providers, command etc
         // bundles: bootstrap.addBundle(new AssetsBundle("/assets/", "/")); - reusable group of functionality
 
