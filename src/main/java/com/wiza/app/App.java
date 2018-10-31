@@ -2,11 +2,15 @@ package com.wiza.app;
 
 import com.wiza.config.AppConfig;
 import com.wiza.controller.IndexController;
+import com.wiza.controller.PeopleController;
 import com.wiza.controller.UserController;
+import com.wiza.dao.PeopleDAO;
 import com.wiza.dao.UserDAO;
 import com.wiza.healthcheck.TemplateHealthCheck;
+import com.wiza.representation.PeopleTable;
 import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.hibernate.HibernateBundle;
 import io.dropwizard.hibernate.SessionFactoryHealthCheck;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.migrations.MigrationsBundle;
@@ -27,8 +31,17 @@ public class App extends Application<AppConfig> {
         return "the-app";
     }
 
+    private final HibernateBundle<AppConfig> hibernate = new HibernateBundle<AppConfig>(PeopleTable.class) {
+        @Override
+        public DataSourceFactory getDataSourceFactory(AppConfig configuration) {
+            return configuration.getDatabase();
+        }
+    };
+
+
     @Override
     public void initialize(Bootstrap<AppConfig> bootstrap) {
+        bootstrap.addBundle(hibernate);
         bootstrap.addBundle(new MigrationsBundle<AppConfig>() {
             @Override
             public DataSourceFactory getDataSourceFactory(AppConfig configuration) {
@@ -60,13 +73,16 @@ public class App extends Application<AppConfig> {
 
         // create daos
         final UserDAO userDAO = jdbi.onDemand(UserDAO.class);
+        final PeopleDAO peopleDAO = new PeopleDAO(hibernate.getSessionFactory());
 
         // create controllers
         final IndexController controller = new IndexController(
                 configuration.getTemplate(),
                 configuration.getDefaultName(),
                 configuration.getPortConfig().getServerPort());
-        final UserController userController = new UserController(userDAO);
+        final UserController userController = new UserController(userDAO); // jdbi
+        final PeopleController peopleController = new PeopleController(peopleDAO); // hibernate
+
 
         // create health checks
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
@@ -75,6 +91,7 @@ public class App extends Application<AppConfig> {
         environment.healthChecks().register("template", healthCheck);
         environment.jersey().register(controller);
         environment.jersey().register(userController);
+        environment.jersey().register(peopleController);
     }
 }
 /**         *public class TruncateDatabaseTask extends Task {

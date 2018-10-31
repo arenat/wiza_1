@@ -1,7 +1,9 @@
 package com.wiza.controller;
 
+import com.codahale.metrics.annotation.Timed;
 import com.wiza.dao.UserDAO;
 import com.wiza.dto.MessageDto;
+import io.dropwizard.hibernate.UnitOfWork;
 import org.w3c.dom.UserDataHandler;
 
 import javax.ws.rs.GET;
@@ -24,9 +26,10 @@ public class UserController {
     }
 
     @GET
+    @Timed
+    @UnitOfWork
     public MessageDto getId(@QueryParam("email") Optional<String> email) {
         Integer userId = userDAO.getUserIdByEmail(email.orElse("renat.ashirbakiev@hp.com"));
         return new MessageDto(userId.toString(), counter.getAndIncrement());
     }
-
 }
