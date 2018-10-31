@@ -9,6 +9,8 @@ import com.wiza.dao.UserDAO;
 import com.wiza.healthcheck.TemplateHealthCheck;
 import com.wiza.representation.PeopleTable;
 import io.dropwizard.Application;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
 import io.dropwizard.hibernate.SessionFactoryHealthCheck;
@@ -41,6 +43,15 @@ public class App extends Application<AppConfig> {
 
     @Override
     public void initialize(Bootstrap<AppConfig> bootstrap) {
+
+        // support of environment variables
+        bootstrap.setConfigurationSourceProvider(
+                new SubstitutingSourceProvider(bootstrap.getConfigurationSourceProvider(),
+                        new EnvironmentVariableSubstitutor(false)
+                )
+        );
+
+
         bootstrap.addBundle(hibernate);
         bootstrap.addBundle(new MigrationsBundle<AppConfig>() {
             @Override
