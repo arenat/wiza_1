@@ -1,6 +1,7 @@
 package com.wiza.app;
 
 import com.wiza.config.AppConfig;
+import com.wiza.controller.ExceptionController;
 import com.wiza.controller.IndexController;
 import com.wiza.controller.PeopleController;
 import com.wiza.controller.UserController;
@@ -95,6 +96,7 @@ public class App extends Application<AppConfig> {
                 configuration.getPortConfig().getServerPort());
         final UserController userController = new UserController(userDAO); // jdbi
         final PeopleController peopleController = new PeopleController(peopleDAO); // hibernate
+        final ExceptionController exceptionController = new ExceptionController();
 
 
         // create health checks
@@ -105,6 +107,7 @@ public class App extends Application<AppConfig> {
         environment.jersey().register(controller);
         environment.jersey().register(userController);
         environment.jersey().register(peopleController);
+        environment.jersey().register(exceptionController);
     }
 }
 /**         *public class TruncateDatabaseTask extends Task {

@@ -32,11 +32,11 @@ database:
 #      archivedLogFilenamePattern: ./logs/example-sql-%d.log.gz
 #      archivedFileCount: 5
 
-logging:
-  appenders:
-    - type: console
-      layout:
-        type: json
+#logging:
+#  appenders:
+#    - type: console
+#      layout:
+#        type: json
 
 
 #logging:
@@ -80,3 +80,10 @@ logging:
 #      currentLogFilename: ./logs/debug.log
 #      archivedLogFilenamePattern: ./logs/debug-%d{yyyy-MM-dd-hh}.log.gz
 #      archivedFileCount: 6
+
+#server:
+#  requestLog:
+#    appenders:
+#      - type: console
+#        filterFactories:
+#          - type: secret-filter-factory
