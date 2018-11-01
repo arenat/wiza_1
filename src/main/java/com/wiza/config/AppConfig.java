@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 public class AppConfig extends Configuration {
 
@@ -18,6 +19,11 @@ public class AppConfig extends Configuration {
     @NotNull
     @JsonProperty
     private DataSourceFactory database = new DataSourceFactory();
+
+    @Valid
+    @NotNull
+    @JsonProperty
+    private Map<String, Map<String, String>> viewRendererConfiguration;
 
     @NotEmpty
     private String template;
@@ -64,5 +70,15 @@ public class AppConfig extends Configuration {
     @JsonProperty
     public void setDatabase(DataSourceFactory database) {
         this.database = database;
+    }
+
+    @JsonProperty("views")
+    public Map<String, Map<String, String>> getViewRendererConfiguration() {
+        return viewRendererConfiguration;
+    }
+
+    @JsonProperty("views")
+    public void setViewRendererConfiguration(Map<String, Map<String, String>> viewRendererConfiguration) {
+        this.viewRendererConfiguration = viewRendererConfiguration;
     }
 }

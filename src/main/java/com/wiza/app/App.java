@@ -26,10 +26,12 @@ import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import io.dropwizard.views.ViewBundle;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.skife.jdbi.v2.DBI;
 
 import java.util.Arrays;
+import java.util.Map;
 
 public class App extends Application<AppConfig> {
     public static void main(String[] args) throws Exception {
@@ -69,6 +71,13 @@ public class App extends Application<AppConfig> {
             }
         });
         bootstrap.addBundle(new AssetsBundle("/assets/", "/"));
+
+        bootstrap.addBundle(new ViewBundle<AppConfig>() {
+            @Override
+            public Map<String, Map<String, String>> getViewConfiguration(AppConfig config) {
+                return config.getViewRendererConfiguration();
+            }
+        });
         // bundles, configuration source providers, command etc
         // bundles: bootstrap.addBundle(new AssetsBundle("/assets/", "/")); - reusable group of functionality
 
@@ -133,6 +142,7 @@ public class App extends Application<AppConfig> {
 //If you want to use @Auth to inject a custom Principal type into your resource
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
 
+
         // controllers
         environment.jersey().register(controller);
         environment.jersey().register(userController);
@@ -141,6 +151,7 @@ public class App extends Application<AppConfig> {
         environment.jersey().register(personController);
         environment.jersey().register(new RequiredDateController());
         environment.jersey().register(new ValidatorController());
+        environment.jersey().register(new FreemakerViewController());
 
     }
 }
