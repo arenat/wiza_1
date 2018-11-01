@@ -1,14 +1,13 @@
 package com.wiza.app;
 
 import com.wiza.config.AppConfig;
-import com.wiza.controller.ExceptionController;
-import com.wiza.controller.IndexController;
-import com.wiza.controller.PeopleController;
-import com.wiza.controller.UserController;
+import com.wiza.controller.*;
 import com.wiza.dao.PeopleDAO;
 import com.wiza.dao.UserDAO;
+import com.wiza.exceptionmapper.CommonExceptionMapper;
 import com.wiza.exceptionmapper.IllegalArgumentExceptionMapper;
 import com.wiza.healthcheck.TemplateHealthCheck;
+import com.wiza.jerseyfilter.dynamicfilter.DateRequiredFeature;
 import com.wiza.representation.PeopleTable;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
@@ -98,6 +97,7 @@ public class App extends Application<AppConfig> {
         final UserController userController = new UserController(userDAO); // jdbi
         final PeopleController peopleController = new PeopleController(peopleDAO); // hibernate
         final ExceptionController exceptionController = new ExceptionController();
+        final PersonController personController = new PersonController();
 
 
         // create health checks
@@ -106,12 +106,19 @@ public class App extends Application<AppConfig> {
         // set up environment
         environment.healthChecks().register("template", healthCheck);
 
+        // exceptions
         environment.jersey().register(new IllegalArgumentExceptionMapper(environment.metrics()));
+        environment.jersey().register(new CommonExceptionMapper(environment.metrics()));
+
+
+        environment.jersey().register(DateRequiredFeature.class);
 
         environment.jersey().register(controller);
         environment.jersey().register(userController);
         environment.jersey().register(peopleController);
         environment.jersey().register(exceptionController);
+        environment.jersey().register(personController);
+        environment.jersey().register(new RequiredDateController());
 
     }
 }
