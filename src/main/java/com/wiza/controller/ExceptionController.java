@@ -16,4 +16,10 @@ public class ExceptionController {
     public MessageDto check(@PathParam("collection") String collection) {
         throw new WebApplicationException("Exception controller", Response.Status.BAD_REQUEST);
     }
+
+    @GET
+    @Path("/illegal")
+    public MessageDto checkIlligal() {
+        throw new IllegalArgumentException();
+    }
 }

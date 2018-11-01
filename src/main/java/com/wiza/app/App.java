@@ -7,6 +7,7 @@ import com.wiza.controller.PeopleController;
 import com.wiza.controller.UserController;
 import com.wiza.dao.PeopleDAO;
 import com.wiza.dao.UserDAO;
+import com.wiza.exceptionmapper.IllegalArgumentExceptionMapper;
 import com.wiza.healthcheck.TemplateHealthCheck;
 import com.wiza.representation.PeopleTable;
 import io.dropwizard.Application;
@@ -104,10 +105,14 @@ public class App extends Application<AppConfig> {
 
         // set up environment
         environment.healthChecks().register("template", healthCheck);
+
+        environment.jersey().register(new IllegalArgumentExceptionMapper(environment.metrics()));
+
         environment.jersey().register(controller);
         environment.jersey().register(userController);
         environment.jersey().register(peopleController);
         environment.jersey().register(exceptionController);
+
     }
 }
 /**         *public class TruncateDatabaseTask extends Task {
