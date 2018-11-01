@@ -9,6 +9,7 @@ import com.wiza.dao.UserDAO;
 import com.wiza.healthcheck.TemplateHealthCheck;
 import com.wiza.representation.PeopleTable;
 import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
@@ -59,6 +60,7 @@ public class App extends Application<AppConfig> {
                 return configuration.getDatabase(); // data source factory
             }
         });
+        bootstrap.addBundle(new AssetsBundle("/assets/", "/"));
         // bundles, configuration source providers, command etc
         // bundles: bootstrap.addBundle(new AssetsBundle("/assets/", "/")); - reusable group of functionality
 
