@@ -4,17 +4,20 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.jackson.JsonSnakeCase;
 
-@JsonSnakeCase
-public class Person {
-    private final String firstName;
+import javax.validation.constraints.NotNull;
 
-    @JsonCreator
-    public Person(@JsonProperty String firstName) {
-        this.firstName = firstName;
+public class Person {
+    @NotNull
+    private String firstName;
+
+    public Person() {
     }
 
-    @JsonProperty
     public String getFirstName() {
         return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 }

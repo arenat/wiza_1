@@ -13,6 +13,8 @@ public class PersonController {
 
     @GET
     public Person get() {
-        return new Person("camelCaseTo_snake_case");
+        Person person = new Person();
+        person.setFirstName("firstName");
+        return person;
     }
 }

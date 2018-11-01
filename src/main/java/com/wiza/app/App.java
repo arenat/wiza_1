@@ -8,9 +8,15 @@ import com.wiza.exceptionmapper.CommonExceptionMapper;
 import com.wiza.exceptionmapper.IllegalArgumentExceptionMapper;
 import com.wiza.healthcheck.TemplateHealthCheck;
 import com.wiza.jerseyfilter.dynamicfilter.DateRequiredFeature;
+import com.wiza.model.User;
 import com.wiza.representation.PeopleTable;
+import com.wiza.security.ExampleAuthenticator;
+import com.wiza.security.ExampleAuthorizer;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.auth.AuthValueFactoryProvider;
+import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
@@ -20,6 +26,7 @@ import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.skife.jdbi.v2.DBI;
 
 import java.util.Arrays;
@@ -81,6 +88,9 @@ public class App extends Application<AppConfig> {
     public void run(AppConfig configuration,
                     Environment environment)
     {
+
+
+
         // create a new DBIFactory
         final DBIFactory factory = new DBIFactory();
         final DBI jdbi = factory.build(environment, configuration.getDatabase(), "mysql"); // DataSourceFactory
@@ -110,15 +120,27 @@ public class App extends Application<AppConfig> {
         environment.jersey().register(new IllegalArgumentExceptionMapper(environment.metrics()));
         environment.jersey().register(new CommonExceptionMapper(environment.metrics()));
 
-
         environment.jersey().register(DateRequiredFeature.class);
 
+        //        security
+        environment.jersey().register(new AuthDynamicFeature(
+                new BasicCredentialAuthFilter.Builder<User>()
+                        .setAuthenticator(new ExampleAuthenticator())
+                        .setAuthorizer(new ExampleAuthorizer())
+                        .setRealm("SUPER SECRET STUFF")
+                        .buildAuthFilter()));
+        environment.jersey().register(RolesAllowedDynamicFeature.class);
+//If you want to use @Auth to inject a custom Principal type into your resource
+        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
+
+        // controllers
         environment.jersey().register(controller);
         environment.jersey().register(userController);
         environment.jersey().register(peopleController);
         environment.jersey().register(exceptionController);
         environment.jersey().register(personController);
         environment.jersey().register(new RequiredDateController());
+        environment.jersey().register(new ValidatorController());
 
     }
 }

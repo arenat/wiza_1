@@ -7,6 +7,9 @@ import com.wiza.dto.MessageDto;
 import com.wiza.representation.PeopleTable;
 import io.dropwizard.hibernate.UnitOfWork;
 
+import javax.annotation.security.DenyAll;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -18,6 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Path("/people")
 @Produces(MediaType.APPLICATION_JSON)
+@PermitAll
 public class PeopleController {
     PeopleDAO peopleDao;
     private final AtomicLong counter = new AtomicLong();
@@ -29,6 +33,7 @@ public class PeopleController {
     @UnitOfWork
     @GET
     @Timed
+    @RolesAllowed("ADMIN")
     public MessageDto getId(@QueryParam("id") Optional<Integer> id) {
         PeopleTable peopleTable = peopleDao.findById(id.orElse(1));
         return new MessageDto(peopleTable.getFullName() + " " + peopleTable.getJobTitle(), counter.getAndIncrement());
