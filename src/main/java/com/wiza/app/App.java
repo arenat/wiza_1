@@ -38,7 +38,6 @@ import java.util.Map;
 public class App extends Application<AppConfig> {
     public static void main(String[] args) throws Exception {
         new App().run(args);
-
     }
 
     @Override
@@ -53,17 +52,14 @@ public class App extends Application<AppConfig> {
         }
     };
 
-
     @Override
     public void initialize(Bootstrap<AppConfig> bootstrap) {
-
         // support of environment variables
         bootstrap.setConfigurationSourceProvider(
                 new SubstitutingSourceProvider(bootstrap.getConfigurationSourceProvider(),
                         new EnvironmentVariableSubstitutor(false)
                 )
         );
-
 
         bootstrap.addBundle(hibernate);
         bootstrap.addBundle(new MigrationsBundle<AppConfig>() {
@@ -82,13 +78,6 @@ public class App extends Application<AppConfig> {
             }
         });
         // bundles, configuration source providers, command etc
-        // bundles: bootstrap.addBundle(new AssetsBundle("/assets/", "/")); - reusable group of functionality
-
-        /**
-         *     bootstrap.addBundle(new AssetsBundle("/assets/css", "/css", null, "css"));
-         *     bootstrap.addBundle(new AssetsBundle("/assets/js", "/js", null, "js"));
-         *     bootstrap.addBundle(new AssetsBundle("/assets/fonts", "/fonts", null, "fonts"));
-         */
         /**
          * command
          * command: bootstrap.addCommand(new MyCommand()); - dropwizard runs based on the arguments provided on the commmand line
@@ -100,9 +89,6 @@ public class App extends Application<AppConfig> {
     public void run(AppConfig configuration,
                     Environment environment)
     {
-
-
-
         // create a new DBIFactory
         final DBIFactory factory = new DBIFactory();
         final DBI jdbi = factory.build(environment, configuration.getDatabase(), "mysql"); // DataSourceFactory
@@ -121,7 +107,6 @@ public class App extends Application<AppConfig> {
         final ExceptionController exceptionController = new ExceptionController();
         final PersonController personController = new PersonController();
 
-
         // create health checks
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
 
@@ -134,7 +119,7 @@ public class App extends Application<AppConfig> {
 
         environment.jersey().register(DateRequiredFeature.class);
 
-        //        security
+        // security
         environment.jersey().register(new AuthDynamicFeature(
                 new BasicCredentialAuthFilter.Builder<User>()
                         .setAuthenticator(new ExampleAuthenticator())
@@ -142,9 +127,8 @@ public class App extends Application<AppConfig> {
                         .setRealm("SUPER SECRET STUFF")
                         .buildAuthFilter()));
         environment.jersey().register(RolesAllowedDynamicFeature.class);
-//If you want to use @Auth to inject a custom Principal type into your resource
+        // If you want to use @Auth to inject a custom Principal type into your resource
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
-
 
         // controllers
         environment.jersey().register(controller);
@@ -179,3 +163,4 @@ public class App extends Application<AppConfig> {
  * Running GC...
  * Done!
  */
+

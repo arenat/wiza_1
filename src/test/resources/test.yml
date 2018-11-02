@@ -1,0 +1,29 @@
+template: Hello, %s!
+defaultName: defName
+
+server:
+  rootPath: /api/
+  applicationConnectors:
+  - type: http
+    port: 9000
+  adminConnectors:
+  - type: http
+    port: 9001
+  requestLog:
+    appenders:
+    - type: console
+      layout:
+        type: access-json
+
+database:
+  driverClass: com.mysql.jdbc.Driver
+  user: root
+  password: qweQWE123!@#
+  url: jdbc:mysql://localhost:3306/appcenter?allowMultiQueries=true
+  validationQuery: "/* Health Check */ SELECT 1"
+
+views:
+  freemarker:
+    strict_syntax: true
+  mustache:
+    cache: false
