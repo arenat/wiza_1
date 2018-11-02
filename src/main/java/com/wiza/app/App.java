@@ -1,5 +1,6 @@
 package com.wiza.app;
 
+import com.codahale.metrics.MetricRegistry;
 import com.wiza.config.AppConfig;
 import com.wiza.controller.*;
 import com.wiza.dao.PeopleDAO;
@@ -12,6 +13,7 @@ import com.wiza.model.User;
 import com.wiza.representation.PeopleTable;
 import com.wiza.security.ExampleAuthenticator;
 import com.wiza.security.ExampleAuthorizer;
+import com.wiza.view.data.Chats;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.auth.AuthDynamicFeature;
@@ -71,6 +73,7 @@ public class App extends Application<AppConfig> {
             }
         });
         bootstrap.addBundle(new AssetsBundle("/assets/", "/"));
+        bootstrap.addBundle(new AssetsBundle("/assets/css", "/assets/css", null, "css"));
 
         bootstrap.addBundle(new ViewBundle<AppConfig>() {
             @Override
@@ -152,6 +155,7 @@ public class App extends Application<AppConfig> {
         environment.jersey().register(new RequiredDateController());
         environment.jersey().register(new ValidatorController());
         environment.jersey().register(new FreemakerViewController());
+        environment.jersey().register(new ChatController(new MetricRegistry(), new Chats()));
 
     }
 }
