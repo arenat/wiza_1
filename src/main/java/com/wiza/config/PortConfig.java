@@ -11,12 +11,10 @@ public class PortConfig {
     @Max(8080)
     private int serverPort = 8000;
 
-    @JsonProperty
     public int getServerPort() {
         return serverPort;
     }
 
-    @JsonProperty
     public void setServerPort(int serverPort) {
         this.serverPort = serverPort;
     }
